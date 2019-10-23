@@ -1,0 +1,22 @@
+---
+
+- name: perform templating
+  set_fact:
+    tmpl_value: |
+      {% for i in range(template_iterations| int) %}
+        {{i | root }}
+        {% for j in range(template_iterations| int) %}
+          {{j | root }}
+          {% for k in range(template_iterations | int) %}
+            {{k | root}}
+          {% endfor %}
+        {% endfor %}
+      {% endfor %}
+
+
+- name: show templated value
+  debug:
+    msg: "{{ tmpl_value[:template_show_len] }}"
+
+- pause:
+    seconds: 1

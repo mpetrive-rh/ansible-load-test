@@ -1,0 +1,21 @@
+---
+
+- name: give me some facts. returns big_fact with fact_size
+  fact_generator:
+    size: "{{ mem_fact_size }}"
+
+- debug:
+    msg: "Found by big fact"
+  when: big_fact is defined
+
+- fail:
+    msg: "Lost by big fact"
+  when: big_fact is not defined
+
+- debug:
+    msg: "{{big_fact[:mem_show_fact_size]}}"
+  when: mem_show_fact
+
+- wait_for:
+    timeout: "{{ mem_wait_time }}"
+    msg: "Done with load test??"

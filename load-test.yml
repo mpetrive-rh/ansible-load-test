@@ -1,0 +1,54 @@
+---
+
+- name: generate hosts
+  hosts: localhost
+  vars:
+    # number of hosts to generate for
+    num_hosts: 5
+  tasks:
+  
+  - name: create load hosts
+    add_host:
+      name: "host{{item}}"
+      groups: load_hosts
+      ansible_connection: local
+    with_sequence: count="{{num_hosts}}"
+
+- name: do memory load test
+  hosts: load_hosts
+  vars:
+    # size of fact to be created in MB
+    mem_fact_size: 100
+    # amount of time to wait after creating fact
+    mem_wait_time: 5
+    # number of time to generate the fact
+    mem_iterations: 5
+    # show the fact generated
+    mem_show_fact: true
+    # amount of fact to show in chars
+    mem_show_fact_size: 1000
+    # skip the memory test
+    mem_skip: false
+  tasks:
+  - name: include mem test
+    include_tasks:
+      file: mem-test.yml
+    with_sequence: count="{{ mem_iterations }}"
+    loop_control:
+      label: "mem iter {{ item }}"
+    when: not mem_skip | bool
+
+- name: do cpu load test
+  hosts: load_hosts
+  vars:
+    # number of template loop iterations with 3 nested loops O(n^3)
+    template_iterations: 100
+    # number of time to run the template generation
+    template_generations: 1000
+    # amount of template to show in chars
+    template_show_len: 4000
+  tasks:
+  - name: include CPU test
+    include_tasks:
+      file: cpu-test.yml
+    with_sequence: count="{{ template_iterations }}"
